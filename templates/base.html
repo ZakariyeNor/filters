@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block meta %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter | Engine{% block title %}{% endblock %}</title>
+    {% endblock meta %}
+
+    {% block corecss %}
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% endblock corecss %}
+
+    {% block head %}
+    <!-- Additional head content -->
+    {% endblock head %}
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    {% block header %}
+    <!-- Header section -->
+    <header class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Filter | Engine</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="/" class="hover:text-blue-500">Home</a></li>
+                    <li><a href="" class="hover:text-blue-500">Products</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    {% endblock header %}
+
+    <main class="container mx-auto py-8">
+        {% block content %}
+        <!-- Main page content goes here -->
+        {% endblock content %}
+    </main>
+
+    {% block js %}
+    <!-- Custom JavaScript -->
+    {% endblock js %}
+
+</body>
+</html>

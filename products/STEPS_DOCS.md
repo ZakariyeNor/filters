@@ -138,3 +138,57 @@ Product.objects.order_by("created_at")
 8. List **active products** with brand containing **"Neutrogena"** OR **"CeraVe"**.  
 9. List products priced **below 100** but with **stock greater than 50**.  
 10. List products **excluding categories** "Treatment & Specialty" and "Sun Care".  
+
+
+# Step 2 – Filtering Products in Views Using GET Parameters
+
+## Overview
+
+In Step 2, we focus on **adding basic filtering functionality** to your Django project.  
+This allows users to **narrow down the list of products** based on different criteria, such as category, price range, or status (active/inactive).  
+
+Instead of using any external packages yet, we handle this **directly in the Django view** using **GET parameters** from the URL.
+
+---
+
+## How Filtering Works
+
+1. **Capture Query Parameters**  
+   - When a user selects filters in the interface (e.g., category dropdown, price fields), their choices are sent to the server as **query parameters**.  
+   - These parameters appear in the URL, for example:  
+     ```
+     /products/?category=Cleansers&min_price=10&status=active
+     ```
+
+2. **Apply Filters in the View**  
+   - In the Django view, we read the query parameters from `request.GET`.  
+   - For each filter (category, min/max price, status), we **check if the user provided a value**.  
+   - Only if a value exists, we **narrow down the list of products** accordingly.
+
+3. **Price Filtering**  
+   - Users can set a minimum and/or maximum price.  
+   - The view ensures products are only included if their price is within the specified range.
+
+4. **Status Filtering**  
+   - Products may have different statuses (like "active" or "inactive").  
+   - This filter allows users to see only products that are currently active, for instance.
+
+5. **Pagination**  
+   - When filtering returns many results, we split the products into pages.  
+   - Pagination keeps the current filters applied, so users can navigate through pages without losing their selected criteria.
+
+---
+
+## What the User Sees
+
+- A **filter form** at the top of the product list allows selecting category, entering price range, and choosing status.  
+- After clicking “Apply,” the page reloads, showing only products that match the selected filters.  
+- Pagination links maintain all selected filters, making browsing smooth.
+
+---
+
+## Key Takeaways
+
+- Using GET parameters is a simple way to **filter querysets without extra packages**.  
+- Always **check if a parameter exists** before applying a filter to avoid errors.  
+- This step sets the foundation for more advanced filtering using tools like **Django Filter**, which will be introduced in Step 3.
