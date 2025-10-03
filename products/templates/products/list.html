@@ -1,84 +1,107 @@
 {% extends "base.html" %}
-
+{% load widget_tweaks %}
 {% block title %}Product List | Filter | Engine{% endblock title %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4">
+<form method="get" class="flex flex-wrap gap-4 p-4 mb-6 bg-gray-100 rounded-lg">
+  {{ filter.form.category }}
+  {{ filter.form.brand }}
+  {{ filter.form.min_price }}
+  {{ filter.form.max_price }}
+   <!-- Clickable ranges -->
+  <div class="flex gap-2 mt-2">
+    <button name="min_price" value="0" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+      Under 100
+    </button>
+    <button name="min_price" value="100" name="max_price" value="200"
+      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+      100 - 200
+    </button>
+    <button name="min_price" value="200" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+      Above 200
+    </button>
+  </div>
+  {{ filter.form.status }}
+  <button type="submit" class="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+    Apply
+  </button>
+</form>
 
-  <!-- Filter Form -->
-  <form method="get" class="flex flex-wrap gap-4 p-4 mb-6 bg-gray-100 rounded-lg">
-  <!-- Category -->
-  <select name="category" class="p-2 border border-gray-300 rounded-md min-w-[150px]">
+<!-- Manual filtering with GET params -->
+<!-- Filter Form -->
+<!-- <form method="get" class="flex flex-wrap gap-4 p-4 mb-6 bg-gray-100 rounded-lg"> -->
+<!-- Category -->
+<!-- <select name="category" class="p-2 border border-gray-300 rounded-md min-w-[150px]">
     <option value="">-- All Categories --</option>
     {% for cat in categories %}
       <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
         {{ cat.name }}
       </option>
     {% endfor %}
-  </select>
+  </select> -->
 
-  <!-- Brand -->
-  <select name="brand" class="p-2 border border-gray-300 rounded-md min-w-[150px]">
+<!-- Brand -->
+<!-- <select name="brand" class="p-2 border border-gray-300 rounded-md min-w-[150px]">
     <option value="">-- All Brands --</option>
     {% for b in brands %}
       <option value="{{ b.id }}" {% if request.GET.brand == b.id|stringformat:"s" %}selected{% endif %}>
         {{ b.name }}
       </option>
     {% endfor %}
-  </select>
+  </select> -->
 
-  <!-- Min Price -->
-  <input type="number" name="min_price" step="0.01" placeholder="Min Price"
+<!-- Min Price -->
+<!-- <input type="number" name="min_price" step="0.01" placeholder="Min Price"
          value="{{ request.GET.min_price }}"
-         class="p-2 border border-gray-300 rounded-md min-w-[120px]">
+         class="p-2 border border-gray-300 rounded-md min-w-[120px]"> -->
 
-  <!-- Max Price -->
-  <input type="number" name="max_price" step="0.01" placeholder="Max Price"
+<!-- Max Price -->
+<!-- <input type="number" name="max_price" step="0.01" placeholder="Max Price"
          value="{{ request.GET.max_price }}"
-         class="p-2 border border-gray-300 rounded-md min-w-[120px]">
+         class="p-2 border border-gray-300 rounded-md min-w-[120px]"> -->
 
-  <!-- Status -->
-  <select name="status" class="p-2 border border-gray-300 rounded-md min-w-[120px]">
+<!-- Status -->
+<!-- <select name="status" class="p-2 border border-gray-300 rounded-md min-w-[120px]">
     <option value="">-- Any Status --</option>
     <option value="active" {% if request.GET.status == "active" %}selected{% endif %}>Active</option>
     <option value="inactive" {% if request.GET.status == "inactive" %}selected{% endif %}>Inactive</option>
-  </select>
+  </select> -->
 
-  <!-- Submit Button -->
-  <button type="submit" class="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+<!-- Submit Button -->
+<!-- <button type="submit" class="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
     Apply
   </button>
-</form>
+</form> -->
 
 
 
-  <!-- Product List -->
-  <div class="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {% for product in products %}
-      <div class="product bg-white p-4 rounded shadow">
-        <h3 class="text-lg font-semibold mb-1">{{ product.name }}</h3>
-        <p class="text-sm text-gray-500 mb-1">{{ product.category.name }} - {{ product.brand.name }}</p>
-        <p class="text-blue-600 font-bold">${{ product.price }}</p>
-      </div>
-    {% empty %}
-      <p>No products found.</p>
-    {% endfor %}
+<!-- Product List -->
+<div class="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {% for product in products %}
+  <div class="product bg-white p-4 rounded shadow">
+    <h3 class="text-lg font-semibold mb-1">{{ product.name }}</h3>
+    <p class="text-sm text-gray-500 mb-1">{{ product.category.name }} - {{ product.brand.name }}</p>
+    <p class="text-blue-600 font-bold">${{ product.price }}</p>
   </div>
+  {% empty %}
+  <p>No products found.</p>
+  {% endfor %}
+</div>
 
-  <!-- Pagination -->
-  <div class="pagination mt-6 flex justify-center items-center gap-4">
-    {% if products.has_previous %}
-      <a href="?{% for key, val in params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.previous_page_number }}"
-         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
-    {% endif %}
+<!-- Pagination -->
+<div class="pagination mt-6 flex justify-center items-center gap-4">
+  {% if products.has_previous %}
+  <a href="?{% for key, val in params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.previous_page_number }}"
+    class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
+  {% endif %}
 
-    <span>Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+  <span>Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
 
-    {% if products.has_next %}
-      <a href="?{% for key, val in params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.next_page_number }}"
-         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Next</a>
-    {% endif %}
-  </div>
+  {% if products.has_next %}
+  <a href="?{% for key, val in params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.next_page_number }}"
+    class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Next</a>
+  {% endif %}
+</div>
 
 </div>
 {% endblock content %}

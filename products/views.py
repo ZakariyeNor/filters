@@ -2,7 +2,18 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import Product, Category, Brand
 
-def product_list(request):
+from django_filters.views import FilterView
+from .filters import ProductFilter
+
+class ProductFilterView(FilterView):
+    model = Product
+    filterset_class = ProductFilter
+    paginate_by = 24
+    template_name = "products/list.html"
+    context_object_name = "products"
+
+# Manual filtering with GET params
+""" def product_list(request):
     qs = Product.objects.select_related("category","brand").all()
     categories = Category.objects.all()
     brands = Brand.objects.all()
@@ -45,3 +56,4 @@ def product_list(request):
             "params": request.GET
         }
     )
+ """

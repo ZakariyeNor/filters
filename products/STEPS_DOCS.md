@@ -192,3 +192,65 @@ Instead of using any external packages yet, we handle this **directly in the Dja
 - Using GET parameters is a simple way to **filter querysets without extra packages**.  
 - Always **check if a parameter exists** before applying a filter to avoid errors.  
 - This step sets the foundation for more advanced filtering using tools like **Django Filter**, which will be introduced in Step 3.
+
+
+# Step 3 — django-filter Integration (FilterSet + Clean URLs)
+
+## Goal
+In this step we move from manual GET parameter parsing to using the django-filter package.  
+This reduces boilerplate code and gives us more powerful filters such as ranges, multiple choice fields, and date filters.  
+It also makes our filtering logic cleaner, reusable, and keeps the URLs human-readable.
+
+---
+
+## Installation and Setup
+First, install the django-filter package and add it to INSTALLED_APPS in settings.py.  
+This ensures Django knows about the filter framework and can render filter forms automatically.
+
+---
+
+## Defining a FilterSet
+A FilterSet is like a form class for filters.  
+We define which fields we want to filter on (such as category, brand, price range, and status).  
+Each filter can have its own widget styling, like a select dropdown for categories and brands, or number inputs for min and max price.  
+This step replaces writing if-statements manually in the view.
+
+---
+
+## Creating a Filter View
+Instead of writing filtering logic by hand in the view, we use django-filter’s FilterView.  
+This integrates directly with our Product model, applies the FilterSet automatically, and gives us pagination and context data without boilerplate.  
+It also ensures the filter form is available in the template via filter.form.
+
+---
+
+## Updating URLs
+The URL mapping points the root path to the ProductFilterView.  
+Now, when visiting the product list page, the filter form will render automatically, and GET query parameters will be used to filter results.  
+For example: /?category=1&brand=2&min_price=50&max_price=200.
+
+---
+
+## Template Usage
+In the template, we render the filter form fields directly.  
+Each filter field (category, brand, min price, max price, status) will show up as a styled input or select box.  
+We also add an “Apply” button to submit the filters.  
+Below the form, we render the product grid and handle empty states (e.g., no products found).
+
+---
+
+## Acceptance Criteria
+- URL query parameters automatically connect to filters (no manual parsing).  
+- Range filters like minimum price and maximum price work correctly.  
+- Choice filters like status and dropdowns for category and brand are functional.  
+- Pagination still works together with the filters.  
+- The filter form is styled and user-friendly.
+
+---
+
+## Example URLs
+- Filtering by category and brand: `/?category=1&brand=2`  
+- Filtering by price range: `/?min_price=50&max_price=200`  
+- Filtering by category and status: `/?category=3&status=inactive`
+
+---
