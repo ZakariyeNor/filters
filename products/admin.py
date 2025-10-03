@@ -12,5 +12,5 @@ class BrandAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'brand', 'status', 'price', 'stock', 'created_at')
-    list_filter = ('status', 'category', 'brand')
+    list_filter = ('status', 'category', 'brand', 'created_at')
     search_fields = ('name',)
