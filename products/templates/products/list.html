@@ -8,19 +8,7 @@
   {{ filter.form.brand }}
   {{ filter.form.min_price }}
   {{ filter.form.max_price }}
-   <!-- Clickable ranges -->
-  <div class="flex gap-2 mt-2">
-    <button name="min_price" value="0" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-      Under 100
-    </button>
-    <button name="min_price" value="100" name="max_price" value="200"
-      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-      100 - 200
-    </button>
-    <button name="min_price" value="200" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-      Above 200
-    </button>
-  </div>
+   
   {{ filter.form.status }}
   <button type="submit" class="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
     Apply
@@ -88,6 +76,20 @@
   {% endfor %}
 </div>
 
+<!-- <div class="pagination">
+  {% if products.has_previous %}
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.previous_page_number }}">Previous</a>
+  {% endif %}
+
+  <span>Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+
+  {% if products.has_next %}
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ products.next_page_number }}">Next</a>
+  {% endif %}
+</div>
+ -->
+
+<!-- MAnual pagination -->
 <!-- Pagination -->
 <div class="pagination mt-6 flex justify-center items-center gap-4">
   {% if products.has_previous %}
