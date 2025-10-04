@@ -25,15 +25,53 @@
             <a href="/" class="hover:text-blue-500">Home</a>
             <h1 class="text-xl font-bold">Filter | Engine</h1>
             <nav>
-                <ul class="flex space-x-4">
-                    <li><a href="{% url 'manual_list' %}" class="hover:text-blue-500">Manual Filters</a></li>
-                    <li><a href="{% url 'dj_filters_list' %}" class="hover:text-blue-500">Django Filters</a></li>
-                    <li><a href="{% url 'checkbox_apply_list' %}" class="hover:text-blue-500">Checkbox + Apply</a></li>
-                    <li><a href="{% url 'product_list_ajax' %}" class="hover:text-blue-500">Instant Filtering</a></li>
-                    <li><a href="{% url 'multi_tags_list' %}" class="hover:text-blue-500">Multi Select</a></li>
-                    <li><a href="{% url 'clear_dynamic_list' %}" class="hover:text-blue-500">Clear Dynamic</a></li>
-                </ul>
-            </nav>
+  <ul class="flex space-x-4 items-center">
+    <li>
+      <a href="{% url 'manual_list' %}" 
+         class="px-4 py-2 rounded-md text-gray-700 hover:text-blue-500 hover:bg-gray-100">
+        Manual Filters
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'dj_filters_list' %}" 
+         class="px-4 py-2 rounded-md text-gray-700 hover:text-blue-500 hover:bg-gray-100">
+        Django Filters
+      </a>
+    </li>
+
+    <!-- Dropdown as a list item -->
+    <li class="relative inline-block text-left">
+      <button type="button"
+        class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 
+               bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+        id="filterMenuButton" aria-expanded="true" aria-haspopup="true">
+        Auto Filter
+        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <!-- Dropdown -->
+      <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg 
+                  bg-white ring-1 ring-black ring-opacity-5 hidden"
+        id="filterDropdown" role="menu" aria-orientation="vertical" aria-labelledby="filterMenuButton">
+        <div class="py-1" role="none">
+          <a href="{% url 'checkbox_apply_list' %}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Checkbox + Apply</a>
+          <a href="{% url 'product_list_ajax' %}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Instant Filtering</a>
+          <a href="{% url 'multi_tags_list' %}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Multi Select</a>
+          <a href="{% url 'clear_dynamic_list' %}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Clear Dynamic</a>
+        </div>
+      </div>
+    </li>
+  </ul>
+</nav>
+
         </div>
     </header>
     {% endblock header %}
@@ -50,3 +88,20 @@
 
 </body>
 </html>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("filterMenuButton");
+    const dropdown = document.getElementById("filterDropdown");
+
+    button.addEventListener("click", () => {
+      dropdown.classList.toggle("hidden");
+    });
+
+    // Auto-close if clicked outside
+    document.addEventListener("click", (e) => {
+      if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+  });
+</script>
