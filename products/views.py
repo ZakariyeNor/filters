@@ -19,8 +19,7 @@ def clear_filters(request):
     return redirect("multi_tags_list")
 
 # Clear filters dynamic
-# Map price_bucket values to min/max
-PRICE_BUCKETSS = {
+PRICE_BUCKETS = {
     "0_50": (0, 50),
     "50_100": (50, 100),
     "100_200": (100, 200),
@@ -29,7 +28,6 @@ PRICE_BUCKETSS = {
     "800_1000": (800, 1000),
 }
 
-# Multi-select tags
 def clear_dynamic(request):
     queries = Product.objects.all()
     
@@ -38,7 +36,7 @@ def clear_dynamic(request):
     selected_statuses = request.GET.getlist("status")
     selected_brands = [int(b) for b in request.GET.getlist("brand") if b.isdigit()]
     
-    # Brand and price bucket
+    # Single brand and price bucket
     selected_brand = request.GET.get("brand")
     price_bucket = request.GET.get("price_bucket")
     
@@ -53,14 +51,17 @@ def clear_dynamic(request):
         queries = queries.filter(brand__id=int(selected_brand))
     
     if price_bucket in PRICE_BUCKETS:
-        min_price, max_price = PRICE_BUCKETSS[price_bucket]
+        min_price, max_price = PRICE_BUCKETS[price_bucket]
         queries = queries.filter(price__gte=min_price, price__lte=max_price)
     
-    # Active filters for display
+    # Merge brands for display without duplicates
+    brand_ids = list(set(selected_brands + ([int(selected_brand)] if selected_brand and selected_brand.isdigit() else [])))
+    
+    # Active filters
     active_filters = {
         "category": Category.objects.filter(id__in=selected_categories),
         "status": [sts for sts in Product.STATUS_CHOICES if sts[0] in selected_statuses],
-        "brand": Brand.objects.filter(id__in=selected_brands + ([int(selected_brand)] if selected_brand else [])),
+        "brand": Brand.objects.filter(id__in=brand_ids),
         "price_bucket": price_bucket,
     }
     
@@ -75,7 +76,7 @@ def clear_dynamic(request):
         tags_html = render_to_string("products/partials/active_filters.html", {"active_filters": active_filters})
         return JsonResponse({"html": html, "tags_html": tags_html})
     
-    # Render full page
+    # Full page render
     return render(
         request,
         "products/clear_filters_list.html",
@@ -93,7 +94,6 @@ def clear_dynamic(request):
             "selected_brand": selected_brand,
         }
     )
-
 # Instant filtering via AJAX
 def product_list_ajax(request):
     query = Product.objects.all()
@@ -151,15 +151,6 @@ def product_list_ajax(request):
         context,
     )
 
-# Map price_bucket values to min/max
-PRICE_BUCKETS = {
-    "0_50": (0, 50),
-    "50_100": (50, 100),
-    "100_200": (100, 200),
-    "200_500": (200, 500),
-    "500_800": (500, 800),
-    "800_1000": (800, 1000),
-}
 
 # Multi-select tags
 def product_list_multi(request):

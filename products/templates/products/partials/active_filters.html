@@ -1,19 +1,31 @@
-<div class="flex flex-wrap gap-2">
-  {% if active_filters.category %}
-    {% for cat in active_filters.category %}
-      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ cat.name }}</span>
-    {% endfor %}
-  {% endif %}
-  
-  {% if active_filters.status %}
-    {% for s in active_filters.status %}
-      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ s.1 }}</span>
-    {% endfor %}
-  {% endif %}
-  
-  {% if active_filters.brand %}
-    {% for b in active_filters.brand %}
-      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ b.name }}</span>
-    {% endfor %}
+{% load custom_filters %}
+
+<div class="flex flex-wrap gap-2 mb-4">
+  {% for cat in active_filters.category %}
+    <div class="bg-gray-200 px-2 py-1 rounded flex items-center">
+      {{ cat.name }}
+      <button class="ml-1 text-red-500 remove-tag" data-filter="category" data-value="{{ cat.id }}">×</button>
+    </div>
+  {% endfor %}
+
+  {% for sts in active_filters.status %}
+    <div class="bg-gray-200 px-2 py-1 rounded flex items-center">
+      {{ sts.1 }}
+      <button class="ml-1 text-red-500 remove-tag" data-filter="status" data-value="{{ sts.0 }}">×</button>
+    </div>
+  {% endfor %}
+
+  {% for brand in active_filters.brand %}
+    <div class="bg-gray-200 px-2 py-1 rounded flex items-center">
+      {{ brand.name }}
+      <button class="ml-1 text-red-500 remove-tag" data-filter="brand" data-value="{{ brand.id }}">×</button>
+    </div>
+  {% endfor %}
+
+  {% if active_filters.price_bucket %}
+    <div class="bg-gray-200 px-2 py-1 rounded flex items-center">
+      {{ active_filters.price_bucket|underscore_to_dash }}
+      <button class="ml-1 text-red-500 remove-tag" data-filter="price_bucket" data-value="{{ active_filters.price_bucket }}">×</button>
+    </div>
   {% endif %}
 </div>
