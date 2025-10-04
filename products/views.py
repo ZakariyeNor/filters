@@ -8,6 +8,66 @@ from .filters import ProductFilter
 
 from django.shortcuts import render
 
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+# Instant filtering via AJAX
+def product_list_ajax(request):
+    query = Product.objects.all()
+    
+    # Filters
+    category_ids = request.GET.getlist("category")
+    if category_ids:
+        query = query.filter(category_id__in=category_ids)
+    
+    brand = request.GET.get("brand")
+    if brand:
+        try:
+            query = query.filter(brand_id=int(brand))
+        except ValueError:
+            pass
+        query = query.filter(brand_id=int(brand))
+    
+    status = request.GET.getlist("status")
+    if status:
+        query = query.filter(status__in=status)
+    
+    price_bucket = request.GET.get("price_bucket")
+    if price_bucket and "_" in price_bucket:
+        try:
+            min_price, max_price = price_bucket.split("_")
+            query = query.filter(price__gte=int(min_price), price__lte=int(max_price))
+        except ValueError:
+            pass
+            
+    # Pagination
+    page = int(request.GET.get("page", 1))
+    paginator = Paginator(query, 24)
+    products = paginator.get_page(page)
+    
+    # Context
+    context = {
+            "products": products,
+            "categories": Category.objects.all(),
+            "statuses": Product.STATUS_CHOICES,
+            "brands": Brand.objects.all(),
+        }
+    
+    # If AJAX, return redered HTML of the product list only
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string(
+            "products/partials/filter_instant_list.html",
+            context,
+        )
+        return JsonResponse({"html": html})
+    # Otherwise render full template
+    return render(
+        request,
+        "products/product_list_ajax.html",
+        context,
+    )
+
+# Home page view
 def home(request):
     """
     Home page for the Filter Engine.
