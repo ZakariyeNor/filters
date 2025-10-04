@@ -60,8 +60,6 @@
   </div>
 </aside>
 
-
-
   <!-- Product List -->
   <main class="flex-1 p-4">
     <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -69,6 +67,35 @@
     </div>
   </main>
 </div>
+<!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-6 space-x-2">
+
+        <!-- Previous -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Previous</a>
+        {% endif %}
+
+        <!-- Page Numbers (current ±2) -->
+        {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} {% if num == page_obj.number %} <span
+            class="px-3 py-1 border rounded bg-blue-600 text-white">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">{{ num }}</a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Next</a>
+            {% endif %}
+
+    </div>
+    {% endif %}
 
 <!-- Optional JS for instant filtering -->
 <script>

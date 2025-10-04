@@ -42,12 +42,13 @@ def product_list_ajax(request):
             
     # Pagination
     page = int(request.GET.get("page", 1))
-    paginator = Paginator(query, 24)
+    paginator = Paginator(query, 32)
     products = paginator.get_page(page)
     
     # Context
     context = {
             "products": products,
+            "page_obj": products,
             "categories": Category.objects.all(),
             "statuses": Product.STATUS_CHOICES,
             "brands": Brand.objects.all(),
@@ -67,6 +68,81 @@ def product_list_ajax(request):
         context,
     )
 
+# Map price_bucket values to min/max
+PRICE_BUCKETS = {
+    "0_50": (0, 50),
+    "50_100": (50, 100),
+    "100_200": (100, 200),
+    "200_500": (200, 500),
+    "500_800": (500, 800),
+    "800_1000": (800, 1000),
+}
+
+# Multi-select tags
+def product_list_multi(request):
+    queries = Product.objects.all()
+    
+    # Multi-select filters
+    selected_categories = [int(c) for c in request.GET.getlist("category") if c.isdigit()]
+    selected_statuses = request.GET.getlist("status")
+    selected_brands = [int(b) for b in request.GET.getlist("brand") if b.isdigit()]
+    
+    # Brand and price bucket
+    selected_brand = request.GET.get("brand")
+    price_bucket = request.GET.get("price_bucket")
+    
+    # Apply filters
+    if selected_categories:
+        queries = queries.filter(category__id__in=selected_categories)
+    if selected_statuses:
+        queries = queries.filter(status__in=selected_statuses)
+    if selected_brands:
+        queries = queries.filter(brand__id__in=selected_brands)
+    if selected_brand and selected_brand.isdigit():
+        queries = queries.filter(brand__id=int(selected_brand))
+    
+    if price_bucket in PRICE_BUCKETS:
+        min_price, max_price = PRICE_BUCKETS[price_bucket]
+        queries = queries.filter(price__gte=min_price, price__lte=max_price)
+    
+    # Active filters for display
+    active_filters = {
+        "category": Category.objects.filter(id__in=selected_categories),
+        "status": [sts for sts in Product.STATUS_CHOICES if sts[0] in selected_statuses],
+        "brand": Brand.objects.filter(id__in=selected_brands + ([int(selected_brand)] if selected_brand else [])),
+        "price_bucket": price_bucket,
+    }
+    
+    # Pagination
+    page = int(request.GET.get("page", 1))
+    paginator = Paginator(queries, 32)
+    products = paginator.get_page(page)
+    
+    # AJAX response
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        html = render_to_string("products/partials/multi_tags_list.html", {"products": products})
+        tags_html = render_to_string("products/partials/active_filters.html", {"active_filters": active_filters})
+        return JsonResponse({"html": html, "tags_html": tags_html})
+    
+    # Render full page
+    return render(
+        request,
+        "products/product_list_tags.html",
+        {
+            "products": products,
+            "page_obj": products,
+            "categories": Category.objects.all(),
+            "statuses": Product.STATUS_CHOICES,
+            "brands": Brand.objects.all(),
+            "active_filters": active_filters,
+            "selected_categories": selected_categories,
+            "selected_statuses": selected_statuses,
+            "selected_brands": selected_brands,
+            "price_bucket": price_bucket,
+            "selected_brand": selected_brand,
+        }
+    )
+    
 # Home page view
 def home(request):
     """

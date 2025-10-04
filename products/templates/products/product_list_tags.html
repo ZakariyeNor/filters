@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="flex gap-6">
+
+  <!-- Sidebar -->
+  {% include "products/partials/sidebar.html" %}
+
+  <!-- Main Content -->
+  <main class="flex-1 p-4">
+    <!-- Active Filters Tags -->
+    <div id="active-filters" class="mb-4">
+      {% include "products/partials/active_filters.html" %}
+    </div>
+
+    <!-- Product List -->
+    <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% include "products/partials/multi_tags_list.html" %}
+    </div>
+  </main>
+</div>
+<!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-6 space-x-2">
+
+        <!-- Previous -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Previous</a>
+        {% endif %}
+
+        <!-- Page Numbers (current ±2) -->
+        {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} {% if num == page_obj.number %} <span
+            class="px-3 py-1 border rounded bg-blue-600 text-white">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">{{ num }}</a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Next</a>
+            {% endif %}
+
+    </div>
+    {% endif %}
+
+<!-- AJAX -->
+<script>
+function updateFilters() {
+  const params = new URLSearchParams();
+
+  // Checkboxes
+  document.querySelectorAll(".filter-checkbox:checked").forEach(ch => {
+    params.append(ch.name, ch.value);
+  });
+
+  // Brand dropdown
+  const brand = document.querySelector("select[name='brand']").value;
+  if (brand) params.set("brand", brand);
+
+  // Price bucket dropdown
+  const priceBucket = document.querySelector("select[name='price_bucket']").value;
+  if (priceBucket) params.set("price_bucket", priceBucket);
+
+  fetch(`?${params.toString()}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("product-list").innerHTML = data.html;
+      document.getElementById("active-filters").innerHTML = data.tags_html;
+    });
+}
+
+// Attach event listeners
+document.querySelectorAll(".filter-checkbox, select[name='brand'], select[name='price_bucket']").forEach(el => {
+  el.addEventListener("change", () => updateFilters());
+});
+</script>
+{% endblock content %}

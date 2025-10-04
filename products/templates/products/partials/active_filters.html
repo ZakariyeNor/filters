@@ -1,0 +1,19 @@
+<div class="flex flex-wrap gap-2">
+  {% if active_filters.category %}
+    {% for cat in active_filters.category %}
+      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ cat.name }}</span>
+    {% endfor %}
+  {% endif %}
+  
+  {% if active_filters.status %}
+    {% for s in active_filters.status %}
+      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ s.1 }}</span>
+    {% endfor %}
+  {% endif %}
+  
+  {% if active_filters.brand %}
+    {% for b in active_filters.brand %}
+      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-sm">{{ b.name }}</span>
+    {% endfor %}
+  {% endif %}
+</div>
