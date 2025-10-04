@@ -254,3 +254,109 @@ Below the form, we render the product grid and handle empty states (e.g., no pro
 - Filtering by category and status: `/?category=3&status=inactive`
 
 ---
+
+## 4. Advanced Filtering / Faceted Search
+
+* Move beyond basic filtering and **django-filter**.  
+* Implement a **faceted search system** like on Amazon, Zalando, or H&M.  
+* Faceted system **filters products** and shows **available options with counts**.
+
+### 4.1 What is Faceted Search?
+
+* **Definition:** Allows users to refine results using multiple filters (category, brand, price, status).  
+* **Difference from basic filtering:** Shows **facet counts** for each option, not just applied filters.  
+* **Example:**
+    * Category:
+        * Shoes (123)
+        * Shirts (87)
+        * Pants (56)
+    * Status:
+        * Active (200)
+        * Inactive (66)
+    * Price:
+        * Under $50 (140)
+        * $50–$100 (90)
+        * Over $100 (36)
+
+* Counts **update dynamically** depending on the active filters.
+
+### 4.2 Features to Build
+
+* **Category Facets:**
+    * Show a list of categories.  
+    * Each category displays the number of products available.  
+    * Counts adjust dynamically if other filters (e.g., status, brand) are applied.  
+
+* **Status Facets:**  
+    * Example: "Active" vs. "Inactive".  
+    * Counts reflect the currently filtered dataset.  
+
+* **Price Buckets:**  
+    * Predefined ranges instead of arbitrary numbers.  
+    * Example buckets:  
+        * Under $50  
+        * $50–$100  
+        * Over $100  
+
+* **Brand Facets (Optional):**  
+    * Display available brands with counts.  
+    * Useful for larger product catalogs.  
+
+* **Multi-select Filters:**  
+    * Users can select multiple options simultaneously.  
+    * Example: Category = Shoes + Shirts, Status = Active
+
+### 4.3 How It Works (Conceptual)
+
+* **Base Query:** Start with the filtered queryset (all products or those matching current filters).  
+* **Facet Calculation:** For each filter group (categories, statuses, price ranges), calculate counts of matching products.  
+* **Dynamic Updates:** Recalculate facet counts when a user applies filters.  
+
+* **Example flow:**
+    1. User loads `/products/` with no filters → show all products and facet counts for every category.  
+    2. User selects "Shoes" → product list shows only shoes, facets update to reflect counts within the "Shoes" subset.  
+    3. User additionally selects "Active" → only active shoes shown, counts update again.
+
+### 4.4 User Experience (UX) Considerations
+
+* **Checkbox UI:**  
+    * Categories, brands, and statuses are best represented as checkboxes (multi-select).  
+    * Example: Sidebar with "Shoes [123]" and "Shirts [87]" where both can be selected at once.
+
+* **Price Ranges:**  
+    * Predefined ranges make it easier for users than typing custom values.  
+    * Use radio buttons (single select) or checkboxes (multi-select).  
+
+* **URL Parameters:**  
+    * Each active filter should be reflected in the URL.  
+    * Example: `/products/?category=shoes&category=shirts&status=active&price_bucket=under_50`  
+    * Ensures filters are **shareable and bookmarkable**.
+
+* **Facet Counts Update:**  
+    * Counts must reflect the **current filtered state**, not the full catalog.  
+    * Example: Filtering only "Active products" → category counts represent only active products.
+
+### 4.5 Performance Challenges
+
+* **Count Queries:** Calculating counts per category/status can be expensive with thousands of products.  
+* **Solutions:**  
+    * Use database aggregation efficiently.  
+    * Cache facet results for frequently used queries.  
+    * Denormalize counts on Category or Brand models and update via signals.
+
+### 4.6 Testing & Validation
+
+* Verify that counts match the **actual number of products** shown.  
+* Ensure **multi-select filters** apply correctly.  
+* Confirm **URL parameters preserve filters** across pagination.  
+* Test combinations of filters (category + brand + price) for correctness.
+
+### 4.7 Acceptance Criteria
+
+* Category facet list displays **dynamic counts**.  
+* Status facet list displays **dynamic counts**.  
+* Price bucket facet displays **correct ranges**.  
+* Multi-select filtering works (selecting multiple categories or brands).  
+* Counts update based on **currently applied filters**.  
+* Filters persist in the URL (**shareable/bookmarkable**).  
+* No unnecessary database queries (verify with **Django Debug Toolbar**).
