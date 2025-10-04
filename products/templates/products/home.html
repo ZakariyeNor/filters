@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Filter Engine Home{% endblock %}
+
+{% block content %}
+<div class="flex justify-center py-12 px-4 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl w-full space-y-12">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800">Welcome to the Filter Engine</h1>
+
+        <p class="text-lg text-left text-gray-700">
+            The Filter Engine is designed to provide a robust and efficient system for filtering products and data
+            in multiple ways. It combines <strong>manual GET filtering</strong>, <strong>Django Filter integration</strong>, 
+            and <strong>faceted search</strong> to allow both simple and complex filtering needs.
+        </p>
+
+        <!-- Step 0-2 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 0–2: Project Foundation and Manual Filtering</h2>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-semibold text-gray-900">Step 0: Project Scaffold and Sample Data</h3>
+                <p class="text-gray-700 text-left">
+                    Create the project structure and define models like <code>Product</code>, <code>Category</code>, and <code>Brand</code>. 
+                    Apply migrations and generate <strong>1000 sample products</strong> using Faker or Factory Boy for realistic testing.
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-semibold text-gray-900">Step 1: QuerySets and Unit Tests</h3>
+                <p class="text-gray-700 text-left">
+                    Explore filtering in the Django shell to verify QuerySets return correct results. 
+                    Unit tests ensure correctness and prevent regressions during development.
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-semibold text-gray-900">Step 2: Views & Templates with GET Filters</h3>
+                <p class="text-gray-700 text-left">
+                    Wire views and templates to accept <strong>GET parameters</strong>. Users select filters and click <strong>Apply</strong> to update results.
+                    Pagination handles large datasets efficiently.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 3-4 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 3–4: Django Filter Integration and Faceted Search</h2>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-semibold text-gray-900">Step 3: Django Filter + Clean URLs</h3>
+                <p class="text-gray-700 text-left">
+                    Integrate <code>django-filter</code> for declarative backend filtering. FilterSets simplify complex QuerySets 
+                    and generate clean, readable URLs for better usability.
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-semibold text-gray-900">Step 4: Faceting Sidebar + Multi-Select + Price Buckets</h3>
+                <p class="text-gray-700 text-left">
+                    Implement a faceted sidebar showing dynamic counts for categories, brands, and attributes. 
+                    Users can multi-select filters, including price buckets, for intuitive exploration of results.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 5: Optimization and Performance</h2>
+            <p class="text-gray-700 text-left">
+                Optimize performance by adding database indexes on frequently filtered fields, using <code>select_related</code> 
+                and <code>prefetch_related</code> to prevent N+1 queries, and integrating caching layers. Query monitoring and tests ensure efficient filtering.
+            </p>
+            <p class="text-gray-600 italic text-left">
+                Following these steps ensures the Filter Engine is robust, efficient, and scalable, supporting both manual 
+                and automatic filtering with maintainable code.
+            </p>
+        </div>
+
+        <div class="text-center">
+            <p class="text-gray-700">
+                Navigate to the demo pages to explore <strong>manual GET filters</strong> and <strong>automatic faceted filters</strong> in action.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

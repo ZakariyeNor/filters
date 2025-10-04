@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Product List | Filter | Engine{% endblock title %}
+
+{% block content %}
+<div class="flex gap-6">
+  <!-- Sidebar -->
+  <aside class="w-1/4 bg-gray-100 p-4 rounded">
+    <form method="get">
+      <!-- Category Dropdown -->
+    <h4 class="font-bold mb-2">Categories</h4>
+    <select name="category" class="p-2 border rounded w-50">
+      <option value="">-- All Categories --</option>
+      {% for cat in category_facets %}
+        <option value="{{ cat.category__id }}"
+          {% if cat.category__id|stringformat:"s" in selected_categories %}selected{% endif %}>
+          {{ cat.category__name }} ({{ cat.count }})
+        </option>
+      {% endfor %}
+    </select>
+
+    <!-- Status Dropdown -->
+    <h4 class="font-bold mt-4 mb-2">Status</h4>
+    <select name="status" class="p-2 border rounded">
+      <option value="">-- Any Status --</option>
+      {% for status in status_facets %}
+        <option value="{{ status.status }}"
+          {% if status.status in selected_statuses %}selected{% endif %}>
+          {{ status.status }} ({{ status.count }})
+        </option>
+      {% endfor %}
+    </select>
+
+    <!-- Price Dropdown -->
+    <h4 class="font-bold mt-4 mb-2">Price</h4>
+    <select name="price_bucket" class="p-2 border rounded">
+      <option value="">-- All Prices --</option>
+      <option value="0_50" {% if selected_price_bucket == '0_50' %}selected{% endif %}>Under $50 ({{ price_buckets.p_0_50 }})</option>
+      <option value="50_100" {% if selected_price_bucket == '50_100' %}selected{% endif %}>$50–$100 ({{ price_buckets.p_50_100 }})</option>
+      <option value="100_200" {% if selected_price_bucket == '100_200' %}selected{% endif %}>$100–$200 ({{ price_buckets.p_100_200 }})</option>
+      <option value="200_500" {% if selected_price_bucket == '200_500' %}selected{% endif %}>$200–$500 ({{ price_buckets.p_200_500 }})</option>
+      <option value="500_800" {% if selected_price_bucket == '500_800' %}selected{% endif %}>$500–$800 ({{ price_buckets.p_500_800 }})</option>
+      <option value="800_1000" {% if selected_price_bucket == '800_1000' %}selected{% endif %}>$800–$1000 ({{ price_buckets.p_800_1000 }})</option>
+    </select>
+
+    <button type="submit" class="mt-4 w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition">
+      Apply Filters
+    </button>
+    </form>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1">
+    <!-- Display applied filters -->
+    <div class="mb-4 flex gap-2 flex-wrap">
+      {% for cat_id in selected_categories %}
+        <span class="bg-gray-200 px-2 py-1 rounded">Category: {{ cat_id }} ✕</span>
+      {% endfor %}
+      {% for status in selected_statuses %}
+        <span class="bg-gray-200 px-2 py-1 rounded">Status: {{ status }} ✕</span>
+      {% endfor %}
+     {% if selected_price_bucket %}
+        <span class="bg-gray-200 px-2 py-1 rounded">Price: {{ selected_price_bucket_display }} ✕</span>
+      {% endif %}
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% for product in products %}
+        <div class="product bg-white p-4 rounded shadow">
+          <h3 class="text-lg font-semibold mb-1">{{ product.name }}</h3>
+          <p class="text-sm text-gray-500 mb-1">{{ product.category.name }} - {{ product.brand.name }}</p>
+          <p class="text-blue-600 font-bold">${{ product.price }}</p>
+        </div>
+      {% empty %}
+        <p>No products found.</p>
+      {% endfor %}
+    </div>
+
+     <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-6 space-x-2">
+
+        <!-- Previous -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Previous</a>
+        {% endif %}
+
+        <!-- Page Numbers (current ±2) -->
+        {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} {% if num == page_obj.number %} <span
+            class="px-3 py-1 border rounded bg-blue-600 text-white">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">{{ num }}</a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Next</a>
+            {% endif %}
+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock content %}

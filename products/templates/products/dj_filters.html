@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Django Filters{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+    <form method="get" class="flex flex-wrap gap-4 p-4 mb-6 bg-gray-100 rounded-lg">
+        {{ filter.form.category }}
+        {{ filter.form.brand }}
+        {{ filter.form.min_price }}
+        {{ filter.form.max_price }}
+
+        {{ filter.form.status }}
+        <button type="submit" class="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+            Apply
+        </button>
+    </form>
+
+
+
+    <!-- Product List -->
+    <div class="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+        <div class="product bg-white p-4 rounded shadow">
+            <h3 class="text-lg font-semibold mb-1">{{ product.name }}</h3>
+            <p class="text-sm text-gray-500 mb-1">{{ product.category.name }} - {{ product.brand.name }}</p>
+            <p class="text-blue-600 font-bold">${{ product.price }}</p>
+        </div>
+        {% empty %}
+        <p>No products found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-6 space-x-2">
+
+        <!-- Previous -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Previous</a>
+        {% endif %}
+
+        <!-- Page Numbers (current ±2) -->
+        {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} {% if num == page_obj.number %} <span
+            class="px-3 py-1 border rounded bg-blue-600 text-white">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">{{ num }}</a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 transition">Next</a>
+            {% endif %}
+
+    </div>
+    {% endif %}
+
+
+</div>
+{% endblock %}
