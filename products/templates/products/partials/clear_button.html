@@ -1,0 +1,8 @@
+<div class="text-center">
+  {% if request.path == '/multi_tags/' %}
+  <a href="{% url 'clear_filters' %}" 
+     class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+     Clear Filters
+  </a>
+  {% endif %}
+</div>

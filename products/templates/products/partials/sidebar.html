@@ -1,9 +1,17 @@
 <aside class="w-64 p-6 h-fit bg-white shadow-lg rounded-xl space-y-8 border border-gray-200">
 
   <!-- Apply Button -->
-  <div class="w-full bg-indigo-600 text-center text-white py-2 rounded-md hover:bg-indigo-700 transition-colors font-semibold">
-    Instant Filters
-  </div>
+
+<div class="text-center">
+    {% if request.resolver_match.url_name == 'multi_tags_list' %}
+        {% include "products/partials/clear_button.html" %}
+    {% else %}
+        <div
+            class="w-full bg-indigo-600 text-center text-white py-2 rounded-md hover:bg-indigo-700 transition-colors font-semibold">
+            Instant Filters
+        </div>
+    {% endif %}
+</div>
 
   <!-- Categories -->
   <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
@@ -55,5 +63,4 @@
       <option value="800_1000" {% if request.GET.price_bucket == "800_1000" %}selected{% endif %}>$800–$1000</option>
     </select>
   </div>
-
 </aside>
