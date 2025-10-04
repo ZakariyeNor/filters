@@ -13,53 +13,94 @@
             and <strong>faceted search</strong> to allow both simple and complex filtering needs.
         </p>
 
-        <!-- Step 0-2 -->
+        <!-- Step 0 -->
         <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 0–2: Project Foundation and Manual Filtering</h2>
-
-            <div class="space-y-2">
-                <h3 class="text-xl font-semibold text-gray-900">Step 0: Project Scaffold and Sample Data</h3>
-                <p class="text-gray-700 text-left">
-                    Create the project structure and define models like <code>Product</code>, <code>Category</code>, and <code>Brand</code>. 
-                    Apply migrations and generate <strong>1000 sample products</strong> using Faker or Factory Boy for realistic testing.
-                </p>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="text-xl font-semibold text-gray-900">Step 1: QuerySets and Unit Tests</h3>
-                <p class="text-gray-700 text-left">
-                    Explore filtering in the Django shell to verify QuerySets return correct results. 
-                    Unit tests ensure correctness and prevent regressions during development.
-                </p>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="text-xl font-semibold text-gray-900">Step 2: Views & Templates with GET Filters</h3>
-                <p class="text-gray-700 text-left">
-                    Wire views and templates to accept <strong>GET parameters</strong>. Users select filters and click <strong>Apply</strong> to update results.
-                    Pagination handles large datasets efficiently.
-                </p>
-            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 0: Project Scaffold and Sample Data</h2>
+            <p class="text-gray-700 text-left">
+                Start by scaffolding the Django project and defining your core models such as <code>Product</code>, 
+                <code>Category</code>, and <code>Brand</code>. Once migrations are applied, populate the database 
+                with at least <strong>1000 sample products</strong> using <code>Faker</code> or <code>Factory Boy</code>. 
+                This ensures realistic testing and reveals performance bottlenecks early.
+            </p>
         </div>
 
-        <!-- Step 3-4 -->
+        <!-- Step 1 -->
         <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 3–4: Django Filter Integration and Faceted Search</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 1: QuerySets and Unit Tests</h2>
+            <p class="text-gray-700 text-left">
+                Work inside the Django shell to explore QuerySets for filtering by category, brand, and attributes. 
+                Write unit tests to verify results—ensuring filters always return the expected data. These tests 
+                act as a safety net when the filtering system becomes more complex.
+            </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 2: Views & Templates with GET Filters</h2>
+            <p class="text-gray-700 text-left">
+                Wire up your views and templates to accept <strong>GET parameters</strong>. Filters such as 
+                <code>?category=shoes&amp;brand=nike</code> make URLs meaningful and shareable. Add an 
+                <strong>Apply</strong> button for users to update results, and integrate pagination to handle 
+                large datasets efficiently.
+            </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 3: Django Filter + Multi-Select Tags</h2>
+            <p class="text-gray-700 text-left">
+                Introduce <code>django-filter</code> for declarative backend filtering. This approach:
+            </p>
+            <ul class="list-disc ml-6 text-gray-700 space-y-1">
+                <li>Encapsulates filter logic in <code>FilterSet</code> classes.</li>
+                <li>Generates automatic forms, reducing template boilerplate.</li>
+                <li>Produces clean, human-readable URLs like <code>?brand=nike&amp;color=red</code>.</li>
+                <li>Supports multi-select with checkboxes, dropdowns, or tag-based UIs.</li>
+                <li>Displays active filters as <strong>removable tags</strong> above the product list.</li>
+            </ul>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 4: Faceting Sidebar + Multi-Select + Price Buckets</h2>
 
             <div class="space-y-2">
-                <h3 class="text-xl font-semibold text-gray-900">Step 3: Django Filter + Clean URLs</h3>
                 <p class="text-gray-700 text-left">
-                    Integrate <code>django-filter</code> for declarative backend filtering. FilterSets simplify complex QuerySets 
-                    and generate clean, readable URLs for better usability.
+                    Step 4 builds an advanced faceted search system. Users can select multiple categories, brands, statuses, and price ranges. The sidebar shows dynamic counts reflecting the current filter context.
                 </p>
-            </div>
 
-            <div class="space-y-2">
-                <h3 class="text-xl font-semibold text-gray-900">Step 4: Faceting Sidebar + Multi-Select + Price Buckets</h3>
-                <p class="text-gray-700 text-left">
-                    Implement a faceted sidebar showing dynamic counts for categories, brands, and attributes. 
-                    Users can multi-select filters, including price buckets, for intuitive exploration of results.
+                <!-- UX Pattern 1 -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <h3 class="font-semibold text-gray-900">UX Pattern 1: Checkbox + Apply Button</h3>
+                    <p class="text-gray-700">Classic approach where users select filters and click an "Apply" button to update results. Allows batching multiple selections before fetching data.</p>
+                </div>
+
+                <!-- UX Pattern 2 -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <h3 class="font-semibold text-gray-900">UX Pattern 2: Instant Filtering (AJAX)</h3>
+                    <p class="text-gray-700">Filters update results instantly when a checkbox or dropdown changes. No "Apply" button is required. AJAX updates the product list and tag UI dynamically.</p>
+                </div>
+
+                <!-- UX Pattern 3 -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <h3 class="font-semibold text-gray-900">UX Pattern 3: Multi-Select Tags</h3>
+                    <p class="text-gray-700">Active filters are displayed as removable tags above the product list. Clicking a tag removes that filter instantly, updating the results without a full page reload.</p>
+                </div>
+
+                <!-- UX Pattern 4 -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <h3 class="font-semibold text-gray-900">UX Pattern 4: Clear Filters</h3>
+                    <p class="text-gray-700">A "Clear Filters" button resets all selected checkboxes, dropdowns, and tags. The page updates instantly via AJAX or redirects to a clean URL, ensuring users can start fresh.</p>
+                </div>
+
+                <p class="text-gray-700 mt-2">
+                    Additional features:
                 </p>
+                <ul class="list-disc ml-6 text-gray-700">
+                    <li>Sidebar counts recalc dynamically to reflect filtered results.</li>
+                    <li>Price buckets categorize products (e.g., Under $50, $50–$100, etc.).</li>
+                    <li>All URL parameters are shareable and reproduce the same filter state.</li>
+                </ul>
             </div>
         </div>
 
@@ -69,10 +110,6 @@
             <p class="text-gray-700 text-left">
                 Optimize performance by adding database indexes on frequently filtered fields, using <code>select_related</code> 
                 and <code>prefetch_related</code> to prevent N+1 queries, and integrating caching layers. Query monitoring and tests ensure efficient filtering.
-            </p>
-            <p class="text-gray-600 italic text-left">
-                Following these steps ensures the Filter Engine is robust, efficient, and scalable, supporting both manual 
-                and automatic filtering with maintainable code.
             </p>
         </div>
 
