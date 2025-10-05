@@ -105,13 +105,66 @@
         </div>
 
         <!-- Step 5 -->
-        <div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 5: Optimization and Performance</h2>
-            <p class="text-gray-700 text-left">
-                Optimize performance by adding database indexes on frequently filtered fields, using <code>select_related</code> 
-                and <code>prefetch_related</code> to prevent N+1 queries, and integrating caching layers. Query monitoring and tests ensure efficient filtering.
-            </p>
-        </div>
+<div class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Step 5: Optimization and Performance</h2>
+    
+    <!-- Introduction -->
+    <p class="text-gray-700">
+        Step 5 focuses on making your filter engine production-ready and highly performant. 
+        This includes optimizing database queries, preventing unnecessary extra queries (N+1 problems), 
+        caching expensive computations, paginating results, monitoring query performance, 
+        and optionally denormalizing data for super-fast facet counts. 
+        Following these practices ensures a smooth and efficient user experience even with large datasets.
+    </p>
+
+    <div class="space-y-3">
+        <h3 class="text-xl font-semibold text-gray-900">5.1 Add Indexes (Schema-Level)</h3>
+        <p class="text-gray-700">
+            Add indexes to frequently filtered fields such as <code>status</code>, <code>price</code>, and <code>created_at</code>.
+            Consider composite indexes for common multi-column queries. Indexes speed up database reads but slightly increase write time.
+            Always test queries and use tools like <strong>EXPLAIN</strong> or Django Debug Toolbar to ensure indexes are effective.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-900">5.2 Avoid N+1 with <code>select_related</code> and <code>prefetch_related</code></h3>
+        <p class="text-gray-700">
+            Avoid N+1 query issues by using <code>select_related</code> for single-valued relationships (FK, OneToOne) 
+            and <code>prefetch_related</code> for many-to-many or reverse FK relationships. 
+            This ensures related objects are fetched in bulk, preventing extra queries in templates.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-900">5.3 Cache Filtering Results & Facet Counts</h3>
+        <p class="text-gray-700">
+            Cache expensive computations like rendered product lists or facet counts. 
+            Use Redis or Django's cache backend to store results keyed by filter parameters. 
+            Invalidate caches on product create/update/delete, or use short TTLs to maintain freshness.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-900">5.4 Pagination & Result Limits</h3>
+        <p class="text-gray-700">
+            Always paginate large result sets (e.g., 24–48 items per page) to avoid heavy queries and long render times. 
+            When caching, include page number in the cache key so each page is cached separately.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-900">5.5 Monitoring & Diagnostics</h3>
+        <p class="text-gray-700">
+            Use tools like Django Debug Toolbar during development to inspect query counts and performance. 
+            In tests, measure query counts per view and template rendering using <code>CaptureQueriesContext</code>, 
+            and enforce a query budget to catch regressions early.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-900">5.6 Denormalization (Optional)</h3>
+        <p class="text-gray-700">
+            For high-traffic faceted filters, maintain denormalized counters like <code>Category.product_count</code> to avoid expensive COUNT() queries. 
+            Update counts via signals on <code>post_save</code> and <code>post_delete</code> of products. 
+            Ensure atomic updates and consider backfill commands to initialize counts for existing data.
+        </p>
+
+        <p class="text-gray-600 italic text-left">
+            Following these optimizations ensures your filter engine is fast, efficient, and scalable, with minimal database queries, 
+            accurate facet counts, and smooth UX even under heavy load.
+        </p>
+</div>
+
 
         <div class="text-center">
             <p class="text-gray-700">
