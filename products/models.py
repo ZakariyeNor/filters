@@ -28,8 +28,10 @@ class Product(models.Model):
 
     class Meta:
         indexes = [
+            models.Index(fields=["category", "brand"]),
             models.Index(fields=["category", "status"]),
             models.Index(fields=["-created_at"]),
+            models.Index(fields=["price", "status"]),
         ]
 
     def __str__(self):

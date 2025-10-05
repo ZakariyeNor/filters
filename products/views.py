@@ -1,4 +1,4 @@
-from django.db.models import Count, Case, When, IntegerField
+from django.db.models import Count, Case, When, IntegerField, Q
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .models import Product, Category, Brand
@@ -28,8 +28,12 @@ PRICE_BUCKETS = {
     "800_1000": (800, 1000),
 }
 
+# Dynamic & optimized view
 def clear_dynamic(request):
-    queries = Product.objects.all()
+    # queries = Product.objects.all()
+    
+    # Optimized query 
+    queries = Product.objects.select_related("category", "brand").all()
     
     # Multi-select filters
     selected_categories = [int(c) for c in request.GET.getlist("category") if c.isdigit()]
@@ -40,22 +44,36 @@ def clear_dynamic(request):
     selected_brand = request.GET.get("brand")
     price_bucket = request.GET.get("price_bucket")
     
-    # Apply filters
-    if selected_categories:
-        queries = queries.filter(category__id__in=selected_categories)
-    if selected_statuses:
-        queries = queries.filter(status__in=selected_statuses)
-    if selected_brands:
-        queries = queries.filter(brand__id__in=selected_brands)
-    if selected_brand and selected_brand.isdigit():
-        queries = queries.filter(brand__id=int(selected_brand))
+    # Merge brand filters
+    brand_ids = selected_brands + (
+        [int(selected_brand)] if selected_brand and selected_brand.isdigit() else []
+    )
+
     
+    # Apply filters
+    filters = Q()
+    if selected_categories:
+        filters &= Q(category__id__in=selected_categories)
+    if selected_statuses:
+        filters &= Q(status__in=selected_statuses)
+    if selected_brands:
+        filters &= Q(brand__id__in=selected_brands)
     if price_bucket in PRICE_BUCKETS:
         min_price, max_price = PRICE_BUCKETS[price_bucket]
-        queries = queries.filter(price__gte=min_price, price__lte=max_price)
+        filters &= Q(price__gte=min_price, price__lte=max_price)
+    
+    queries = queries.filter(filters).order_by("-created_at")
+    
+    # if selected_brand and selected_brand.isdigit():
+    #    queries = queries.filter(brand__id=int(selected_brand))
     
     # Merge brands for display without duplicates
-    brand_ids = list(set(selected_brands + ([int(selected_brand)] if selected_brand and selected_brand.isdigit() else [])))
+    # brand_ids = list(set(selected_brands + ([int(selected_brand)] if selected_brand and selected_brand.isdigit() else [])))
+    
+    # Pagination
+    page = int(request.GET.get("page", 1))
+    paginator = Paginator(queries, 32)
+    products = paginator.get_page(page)
     
     # Active filters
     active_filters = {
@@ -65,10 +83,6 @@ def clear_dynamic(request):
         "price_bucket": price_bucket,
     }
     
-    # Pagination
-    page = int(request.GET.get("page", 1))
-    paginator = Paginator(queries, 32)
-    products = paginator.get_page(page)
     
     # AJAX response
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -94,6 +108,7 @@ def clear_dynamic(request):
             "selected_brand": selected_brand,
         }
     )
+
 # Instant filtering via AJAX
 def product_list_ajax(request):
     query = Product.objects.all()
@@ -150,7 +165,6 @@ def product_list_ajax(request):
         "products/product_list_ajax.html",
         context,
     )
-
 
 # Multi-select tags
 def product_list_multi(request):
