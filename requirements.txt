@@ -7,3 +7,4 @@ factory_boy==3.3.3
 Faker==37.8.0
 sqlparse==0.5.3
 tzdata==2025.2
+/
