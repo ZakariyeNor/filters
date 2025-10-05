@@ -381,6 +381,9 @@ Below the form, we render the product grid and handle empty states (e.g., no pro
 
 ## 5.2 Avoid N+1 Queries
 
+### N+1 queries
+### ![](/static/images/d_query.jpg)
+
 **Purpose:** Each foreign-key or reverse relationship accessed in a loop can trigger additional database queries, slowing performance.  
 
 **Key Points:**
@@ -389,6 +392,8 @@ Below the form, we render the product grid and handle empty states (e.g., no pro
 - Prefetch multi-valued relationships (many-to-many or reverse foreign keys) efficiently.  
 - Ensures templates can access related data without firing extra queries, keeping performance predictable.
 
+### Query optimization
+### ![](/static/images/avoiding.png)
 ---
 
 ## 5.3 Cache Filtering Results & Facet Counts
@@ -403,6 +408,8 @@ Below the form, we render the product grid and handle empty states (e.g., no pro
 - Coarse cache invalidation is simpler but may temporarily remove more data than necessary; precise invalidation is complex but more efficient.  
 - Choose a reasonable cache time-to-live (TTL) to balance freshness and performance.
 
+### Caching using redis
+### ![](/static/images/caching.jpg)
 ---
 
 ## 5.4 Pagination & Result Limits
