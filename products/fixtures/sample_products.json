@@ -1,0 +1,25 @@
+[
+  {
+    "model": "products.category",
+    "pk": 1,
+    "fields": {"name": "Moisturizers"}
+  },
+  {
+    "model": "products.brand",
+    "pk": 1,
+    "fields": {"name": "Cosrx"}
+  },
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "name": "Sample Product",
+      "category": 1,
+      "brand": 1,
+      "status": "active",
+      "price": "99.99",
+      "stock": 10,
+      "created_at": "2025-10-05T07:00:00Z"
+    }
+  }
+]

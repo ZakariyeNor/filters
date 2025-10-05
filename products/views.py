@@ -11,6 +11,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
+from .optimizations import cache_products_response
+
 # Clear filters list
 def clear_filters(request):
     """
@@ -49,7 +51,6 @@ def clear_dynamic(request):
         [int(selected_brand)] if selected_brand and selected_brand.isdigit() else []
     )
 
-    
     # Apply filters
     filters = Q()
     if selected_categories:
@@ -83,30 +84,37 @@ def clear_dynamic(request):
         "price_bucket": price_bucket,
     }
     
+    # -- Cashing --
+    payload = cache_products_response(request, products, active_filters)
     
     # AJAX response
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        html = render_to_string("products/partials/multi_tags_list.html", {"products": products})
-        tags_html = render_to_string("products/partials/active_filters.html", {"active_filters": active_filters})
-        return JsonResponse({"html": html, "tags_html": tags_html})
+        return JsonResponse(payload)
+       
+        # html = render_to_string("products/partials/multi_tags_list.html", {"products": products})
+        # tags_html = render_to_string("products/partials/active_filters.html", {"active_filters": active_filters})
+        # return JsonResponse(payload,  {"html": html, "tags_html": tags_html}) """
+        
+    # context
+    context = {
+        "products": products,
+        "page_obj": products,
+        "categories": Category.objects.all(),
+        "statuses": Product.STATUS_CHOICES,
+        "brands": Brand.objects.all(),
+        "active_filters": active_filters,
+        "selected_categories": selected_categories,
+        "selected_statuses": selected_statuses,
+        "selected_brands": selected_brands,
+        "price_bucket": price_bucket,
+        "selected_brand": selected_brand,
+    }
     
     # Full page render
     return render(
         request,
         "products/clear_filters_list.html",
-        {
-            "products": products,
-            "page_obj": products,
-            "categories": Category.objects.all(),
-            "statuses": Product.STATUS_CHOICES,
-            "brands": Brand.objects.all(),
-            "active_filters": active_filters,
-            "selected_categories": selected_categories,
-            "selected_statuses": selected_statuses,
-            "selected_brands": selected_brands,
-            "price_bucket": price_bucket,
-            "selected_brand": selected_brand,
-        }
+        context
     )
 
 # Instant filtering via AJAX
