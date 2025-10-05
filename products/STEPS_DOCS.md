@@ -360,3 +360,113 @@ Below the form, we render the product grid and handle empty states (e.g., no pro
 * Counts update based on **currently applied filters**.  
 * Filters persist in the URL (**shareable/bookmarkable**).  
 * No unnecessary database queries (verify with **Django Debug Toolbar**).
+
+# Step 5 — Optimizing Filters (Indexes, Relationships, Caching, Monitoring)
+
+**Goal:** Make the product list and faceted queries fast and production-ready. Reduce database queries, avoid N+1 problems, cache expensive computations, and be able to measure query counts in tests.
+
+---
+
+## 5.1 Add Indexes (Schema-Level)
+
+**Purpose:** Improve the speed of queries for frequently filtered fields. Indexes help the database quickly locate and order data.  
+
+**Key Points:**
+- Add single-field indexes on frequently filtered fields such as status, price, and created_at.  
+- Consider composite indexes for common multi-column queries, for example category + status.  
+- Always measure performance impact locally before applying indexes. Indexes speed up reads but slightly slow down writes.  
+- Use tools like `EXPLAIN` or Django Debug Toolbar to verify index usage.
+
+---
+
+## 5.2 Avoid N+1 Queries
+
+**Purpose:** Each foreign-key or reverse relationship accessed in a loop can trigger additional database queries, slowing performance.  
+
+**Key Points:**
+- Use techniques like eager loading to fetch related objects in the same query.  
+- Fetch single-valued relationships (foreign keys or one-to-one) together with the main query.  
+- Prefetch multi-valued relationships (many-to-many or reverse foreign keys) efficiently.  
+- Ensures templates can access related data without firing extra queries, keeping performance predictable.
+
+---
+
+## 5.3 Cache Filtering Results & Facet Counts
+
+**Purpose:** Computing facets and repeated filter combinations is expensive. Caching reduces redundant database queries and speeds up response times.  
+
+**Key Points:**
+- Cache rendered HTML fragments for the product list and active filters.  
+- Cache results keyed by filter parameters to ensure correctness.  
+- Use a fast cache backend, such as Redis.  
+- Invalidate caches on product updates, creations, or deletions to prevent stale data.  
+- Coarse cache invalidation is simpler but may temporarily remove more data than necessary; precise invalidation is complex but more efficient.  
+- Choose a reasonable cache time-to-live (TTL) to balance freshness and performance.
+
+---
+
+## 5.4 Pagination & Result Limits
+
+**Purpose:** Avoid returning huge result sets that can degrade performance.  
+
+**Key Points:**
+- Always paginate product results, e.g., 24 or 48 items per page.  
+- When caching, cache the rendered page along with its filters.  
+- Avoid fully evaluating large querysets; use slicing to limit the number of records returned.  
+- Proper pagination ensures fast rendering and lower memory usage on the server.
+
+---
+
+## 5.5 Monitoring & Diagnostics
+
+**Purpose:** Measure query performance, detect inefficiencies, and prevent regressions.  
+
+**Key Points:**
+- Use tools like Django Debug Toolbar for development.  
+- Production monitoring can use Datadog, New Relic, or similar tools.  
+- Capture the number of queries executed per view or template rendering to detect N+1 issues.  
+- Set a query budget (maximum allowed queries) for each page and enforce it via automated tests.  
+- Review captured queries to ensure that related object accesses in templates do not add extra queries.
+
+---
+
+## 5.6 Denormalization: Product Count on Category
+
+**Purpose:** Avoid computing COUNT() queries for categories on every request.  
+
+**Key Points:**
+- Maintain a `product_count` field on each category that is updated automatically.  
+- Increment the count when a new product is added to the category.  
+- Decrement the count when a product is deleted.  
+- Use signals or hooks to ensure counts are always consistent.  
+- Consider bulk operations or management commands for initial backfill or re-calculation.
+
+---
+
+## 5.7 Test Query Count for Denormalized Facets
+
+**Purpose:** Ensure denormalization and caching work as intended without introducing hidden queries.  
+
+**Key Points:**
+- Capture queries during template rendering to confirm no extra database hits occur.  
+- Test that removing or updating products updates the cached counts correctly.  
+- Validate that multi-select facets do not trigger unexpected additional queries.  
+
+---
+
+## 5.8 Summary / Acceptance Criteria
+
+**Expected Outcomes:**
+- Product list pages perform within an acceptable query budget (e.g., ≤ 6 queries).  
+- Facet counts are precomputed or cached, minimizing repeated COUNT() queries.  
+- No N+1 queries exist in templates.  
+- Pagination, caching, and denormalized counts combine to ensure fast, predictable filtering performance.  
+- Indexes are used efficiently to speed up queries on large datasets.  
+- Monitoring and automated tests enforce performance standards.
+
+---
+
+**Notes:**  
+- Always balance read optimization with write performance.  
+- Regularly review query plans and caching strategies as data grows.  
+- Document and track all optimizations to maintain maintainable and scalable code.
